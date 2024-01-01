@@ -24,7 +24,7 @@ class UserAuth extends StateNotifier<AuthState> {
     log("In Check Authentication function");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    final accessToken = prefs.getString("AT");
+    final accessToken = 'prefs.getString("AT")';
     final refreshToken = prefs.getString("RT");
 
     log("Access Token: $accessToken");
@@ -47,13 +47,12 @@ class UserAuth extends StateNotifier<AuthState> {
         body: json.encode({'token': accessToken}),
       );
 
-      log(json.decode(response.body)["message"] ??
-          "No message at verify token");
+      log(json.decode(response.body)["message"]);
 
       if (response.statusCode != 200) {
         log("Call for refresh token");
         // var email = json.decode(response.body)["email"];
-        String url2 = '$host/auth/refreshtoken';
+        String url2 = '$host/auth/refreshToken';
         final response2 = await http.post(
           Uri.parse(url2),
           headers: header,
@@ -64,8 +63,9 @@ class UserAuth extends StateNotifier<AuthState> {
           state = state.copyWith(
             appStatus: AppStatus.authenticated,
           );
-          final newAccessToken = json.decode(response2.body)["accessToken"];
-          final newRefreshToken = json.decode(response2.body)["refreshToken"];
+          final newAccessToken = json.decode(response2.body)["newAccessToken"];
+          final newRefreshToken =
+              json.decode(response2.body)["newRefreshToken"];
           prefs.setString("AT", newAccessToken);
           prefs.setString("RT", newRefreshToken);
 
@@ -77,7 +77,11 @@ class UserAuth extends StateNotifier<AuthState> {
           log("Invalid Refresh Token");
         }
       } else {
+        state = state.copyWith(
+          appStatus: AppStatus.authenticated,
+        );
         var data = json.decode(response.body);
+        log(data.toString());
         await getUserInfo(data["email"], data["role"]);
       }
     } catch (e) {
