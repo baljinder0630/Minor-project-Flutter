@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -52,25 +52,28 @@ class _LocationHomePageState extends State<LocationHomePage> {
   }
 
   _getPatientLocation() async {
-    final response = await http.get(Uri.parse(
-        'https://assistalzheimer.onrender.com/api/location/patient/?patientId=6526efe2c7925af873dacc6f'));
+    try {
+      final response = await http.get(Uri.parse(
+          'https://assistalzheimer.onrender.com/api/location/patient/?patientId=6526efe2c7925af873dacc6f'));
 
-    // print(response.body.toString());
-    var data = jsonDecode(response.body);
-    if (data["success"] == true) {
-      double patientLatitude = double.parse(data['latitude']);
-      double patientLongitude = double.parse(data['longitude']);
-      _getCurrentLocation();
-      _distance = Geolocator.distanceBetween(
-        _currentPosition.latitude,
-        _currentPosition.longitude,
-        patientLatitude,
-        patientLongitude,
-      );
-      // print(_distance);
-      setState(() {});
-    } else {
-      print('Failed to load patient location');
+      // print(response.body.toString());
+      var data = jsonDecode(response.body);
+      log(data["message"]);
+      if (data["success"] == true) {
+        double patientLatitude = double.parse(data['latitude']);
+        double patientLongitude = double.parse(data['longitude']);
+        _getCurrentLocation();
+        _distance = Geolocator.distanceBetween(
+          _currentPosition.latitude,
+          _currentPosition.longitude,
+          patientLatitude,
+          patientLongitude,
+        );
+        // print(_distance);
+        setState(() {});
+      }
+    } catch (e) {
+      log(e.toString());
     }
   }
 
@@ -128,9 +131,9 @@ class _LocationHomePageState extends State<LocationHomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 25.0),
               child: ElevatedButton(
                 onPressed: () async {
-                  // Navigator.of(context).push(MaterialPageRoute(builder: (c) {
-                  //   return GoogleMapPage();
-                  // }));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (c) {
+                    return GoogleMapPage();
+                  }));
                 },
                 child: const Text("Get Location"),
               ),

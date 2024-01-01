@@ -35,6 +35,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    final authStatus = ref.watch(authStateProvider).authStatus;
     return Form(
       key: _formkey,
       child: Column(
@@ -110,7 +111,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             tag: "login_btn",
             child: ElevatedButton(
               onPressed: () async {
-                if (_formkey.currentState!.validate()) {
+                print(authStatus);
+                if (authStatus != AuthStatus.processing &&
+                    _formkey.currentState!.validate()) {
                   var resp = await ref.read(authStateProvider.notifier).signIn(
                       email: emailController.text.trim(),
                       password: passController.text.trim(),
@@ -141,9 +144,11 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                   }
                 }
               },
-              child: Text(
-                "Login".toUpperCase(),
-              ),
+              child: authStatus == AuthStatus.processing
+                  ? CircularProgressIndicator()
+                  : Text(
+                      "Login".toUpperCase(),
+                    ),
             ),
           ),
           const SizedBox(height: defaultPadding),
