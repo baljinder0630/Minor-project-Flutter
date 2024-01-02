@@ -5,14 +5,14 @@ class User {
   final String id;
   final String name;
   final String role;
-  final String contactNumber;
+  String? contactNumber;
 
   User(
       {required this.email,
       required this.id,
       required this.name,
       required this.role,
-      required this.contactNumber});
+      this.contactNumber});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{

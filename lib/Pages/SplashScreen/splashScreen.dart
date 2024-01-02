@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/nav.dart';
-import 'package:minor_project/Pages/welcome_screen.dart';
+import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -22,7 +22,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const Nav(),
+            builder: (context) => Nav(),
           ),
         );
       } else if (next.appStatus == AppStatus.unauthenticated) {

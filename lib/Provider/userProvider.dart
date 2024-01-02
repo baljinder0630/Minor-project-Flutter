@@ -12,8 +12,7 @@ final authStateProvider =
 class UserAuth extends StateNotifier<AuthState> {
   UserAuth()
       : super(AuthState(
-          user: User(
-              email: '', id: '', name: '', role: 'patient', contactNumber: ''),
+          user: User(email: '', id: '', name: '', role: '', contactNumber: ''),
           authStatus: AuthStatus.initial,
           appStatus: AppStatus.inital,
         )) {
@@ -24,7 +23,7 @@ class UserAuth extends StateNotifier<AuthState> {
     log("In Check Authentication function");
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    final accessToken = 'prefs.getString("AT")';
+    final accessToken = prefs.getString("AT");
     final refreshToken = prefs.getString("RT");
 
     log("Access Token: $accessToken");
@@ -39,6 +38,7 @@ class UserAuth extends StateNotifier<AuthState> {
     }
     try {
       String url = '$host/auth/verifytoken';
+      log(url);
       var header = {'Content-Type': 'application/json'};
 
       final response = await http.post(
@@ -76,14 +76,13 @@ class UserAuth extends StateNotifier<AuthState> {
           state = state.copyWith(appStatus: AppStatus.unauthenticated);
           log("Invalid Refresh Token");
         }
-      } else {
-        state = state.copyWith(
-          appStatus: AppStatus.authenticated,
-        );
-        var data = json.decode(response.body);
-        log(data.toString());
-        await getUserInfo(data["email"], data["role"]);
       }
+      state = state.copyWith(
+        appStatus: AppStatus.authenticated,
+      );
+      var data = json.decode(response.body);
+      log(data.toString());
+      await getUserInfo(data["email"], data["role"]);
     } catch (e) {
       state = state.copyWith(appStatus: AppStatus.unauthenticated);
       print(e);
@@ -91,6 +90,7 @@ class UserAuth extends StateNotifier<AuthState> {
   }
 
   getUserInfo(String email, String role) async {
+    log("Email: $email Role: $role");
     log("In Get User Info function");
     try {
       String url = '$host/profile/getUserInfo';
@@ -104,14 +104,14 @@ class UserAuth extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        log(data);
+        log(data.toString());
         state = state.copyWith(
           user: User(
-              email: email,
-              id: data["id"],
-              name: data["name"],
-              role: role,
-              contactNumber: data["contactNumber"]),
+            email: email,
+            id: data["id"],
+            name: data["name"],
+            role: role.toString(),
+          ),
         );
 
         log("User: ${state.user}");
@@ -207,6 +207,8 @@ class UserAuth extends StateNotifier<AuthState> {
       return {"success": false, "message": "Something went wrong"};
     }
   }
+
+  // TODO: Implement logout
 }
 
 class AuthState {

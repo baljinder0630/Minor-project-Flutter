@@ -1,37 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:minor_project/components/Auth/Signup/sign_up_top_image.dart';
-import 'package:minor_project/components/Auth/Signup/signup_form.dart';
-import '../components/background.dart';
-import '../constants.dart';
-import '../responsive.dart';
+import 'package:minor_project/Pages/Auth/Login/Component/login_form.dart';
+import 'package:minor_project/Pages/Auth/Login/Component/login_screen_top_image.dart';
+import 'package:minor_project/Pages/background.dart';
+import 'package:minor_project/responsive.dart';
 
-class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Background(
       child: SingleChildScrollView(
         child: Responsive(
-          mobile: const MobileSignupScreen(),
+          mobile: Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: const MobileLoginScreen(),
+          ),
           desktop: Row(
             children: [
               const Expanded(
-                child: SignUpScreenTopImage(),
+                child: LoginScreenTopImage(),
               ),
               Expanded(
-                child: Column(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     SizedBox(
                       width: 450,
-                      child: SignUpForm(),
+                      child: LoginForm(),
                     ),
-                    SizedBox(height: defaultPadding / 2),
-                    // SocalSignUp()
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -40,8 +41,8 @@ class SignUpScreen extends StatelessWidget {
   }
 }
 
-class MobileSignupScreen extends StatelessWidget {
-  const MobileSignupScreen({
+class MobileLoginScreen extends StatelessWidget {
+  const MobileLoginScreen({
     Key? key,
   }) : super(key: key);
 
@@ -50,18 +51,17 @@ class MobileSignupScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        const SignUpScreenTopImage(),
+        const LoginScreenTopImage(),
         Row(
           children: const [
             Spacer(),
             Expanded(
               flex: 8,
-              child: SignUpForm(),
+              child: LoginForm(),
             ),
             Spacer(),
           ],
         ),
-        // const SocalSignUp()
       ],
     );
   }

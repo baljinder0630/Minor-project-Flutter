@@ -1,12 +1,13 @@
+// ignore_for_file: unused_import
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/nav.dart';
-import 'package:minor_project/Pages/navPatient.dart';
-import 'package:minor_project/Pages/welcome_screen.dart';
-import 'package:minor_project/components/SplashScreen/splashScreen.dart';
+import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
+import 'package:minor_project/Pages/SplashScreen/splashScreen.dart';
 import 'package:minor_project/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_10y.dart';

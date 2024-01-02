@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:minor_project/components/Welcome/login_signup_btn.dart';
-import 'package:minor_project/components/Welcome/welcome_image.dart';
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
-import '../components/background.dart';
-import '../responsive.dart';
+import 'package:flutter/material.dart';
+import 'package:minor_project/Pages/Auth/Login/Component/login_signup_btn.dart';
+import 'package:minor_project/Pages/WelcomeScreen/Component/welcome_image.dart';
+import 'package:minor_project/Pages/background.dart';
+
+import '../../responsive.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
