@@ -37,31 +37,61 @@ class _QRScanPageState extends State<QRScanPage> {
             alignment: Alignment.center,
             children: <Widget>[
               buildQrView(context),
-              if (barcode != null) buildResult(),
+              Positioned(bottom: 10, child: buildResult()),
+              Positioned(top: 10, child: buildControlButtons()),
             ],
           ),
         ),
       );
 
-  Widget buildResult() => GestureDetector(
-        onTap: () {
-          // Handle navigation to the web page using the URL from the barcode
-          // For example, you can use the url_launcher package.
-          // Here, I'm just printing the URL to the console.
-          print('Opening URL: ${barcode!.code}');
-        },
-        child: Container(
-          color: Colors.white,
-          child: Center(
-            child: Text(
-              'URL: ${barcode!.code}',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+  Widget buildResult() => Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          barcode != null ? 'Result: ${barcode!.code}' : 'Scan a code',
+          maxLines: 3,
+        ),
+      );
+
+  Widget buildControlButtons() => Container(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white24,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.switch_camera),
+              onPressed: () async {
+                await controller?.flipCamera();
+                setState(() {});
+              },
+            ),
+            IconButton(
+              onPressed: () async {
+                await controller?.toggleFlash();
+                setState(() {});
+              },
+              icon: FutureBuilder<bool?>(
+                future: controller?.getFlashStatus(),
+                builder: (context, snapshot) {
+                  if (snapshot.data != null) {
+                    return Icon(
+                        snapshot.data! ? Icons.flash_on : Icons.flash_off);
+                  } else {
+                    return Container();
+                  }
+                },
               ),
             ),
-          ),
+          ],
         ),
       );
 
@@ -69,8 +99,6 @@ class _QRScanPageState extends State<QRScanPage> {
         key: qrKey,
         onQRViewCreated: onQRViewCreated,
         overlay: QrScannerOverlayShape(
-          overlayColor:
-              Colors.transparent, // Set overlay color to be transparent
           borderColor: Theme.of(context).colorScheme.secondary,
           borderRadius: 10,
           borderLength: 20,
@@ -87,17 +115,6 @@ class _QRScanPageState extends State<QRScanPage> {
     controller.scannedDataStream.listen(
       (barCode) => setState(() {
         this.barcode = barCode;
-
-        // Pause the camera when a QR code is scanned
-        controller.pauseCamera();
-
-        // Optionally, you can add a delay before navigating to the white page
-        Future.delayed(Duration(seconds: 2), () {
-          // Navigate to the white page
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => buildResult()),
-          );
-        });
       }),
     );
   }
