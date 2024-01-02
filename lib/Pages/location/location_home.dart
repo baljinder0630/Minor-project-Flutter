@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:minor_project/location/googleMap.dart';
+import 'package:minor_project/Pages/location/googleMap.dart';
 
 class LocationHomePage extends StatefulWidget {
   const LocationHomePage({super.key});

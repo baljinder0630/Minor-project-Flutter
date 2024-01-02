@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScanPage extends StatefulWidget {
-  const QRScanPage({super.key});
+  const QRScanPage({Key? key}) : super(key: key);
 
   @override
   State<QRScanPage> createState() => _QRScanPageState();
@@ -14,6 +14,7 @@ class _QRScanPageState extends State<QRScanPage> {
 
   Barcode? barcode;
   QRViewController? controller;
+
   @override
   void dispose() {
     controller?.dispose();
@@ -31,15 +32,17 @@ class _QRScanPageState extends State<QRScanPage> {
 
   @override
   Widget build(BuildContext context) => SafeArea(
-          child: Scaffold(
-              body: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          buildQrView(context),
-          Positioned(bottom: 10, child: buildResult()),
-          Positioned(top: 10, child: buildControlButtons()),
-        ],
-      )));
+        child: Scaffold(
+          body: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              buildQrView(context),
+              Positioned(bottom: 10, child: buildResult()),
+              Positioned(top: 10, child: buildControlButtons()),
+            ],
+          ),
+        ),
+      );
 
   Widget buildResult() => Container(
         padding: EdgeInsets.all(12),
@@ -65,34 +68,29 @@ class _QRScanPageState extends State<QRScanPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             IconButton(
-                icon: FutureBuilder(
-                    future: controller?.getCameraInfo(),
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null) {
-                        return Icon(Icons.switch_camera);
-                      } else {
-                        return Container();
-                      }
-                    }),
-                onPressed: () async {
-                  await controller?.flipCamera();
-                  setState(() {});
-                }),
+              icon: Icon(Icons.switch_camera),
+              onPressed: () async {
+                await controller?.flipCamera();
+                setState(() {});
+              },
+            ),
             IconButton(
-                onPressed: () async {
-                  await controller?.toggleFlash();
-                  setState(() {});
+              onPressed: () async {
+                await controller?.toggleFlash();
+                setState(() {});
+              },
+              icon: FutureBuilder<bool?>(
+                future: controller?.getFlashStatus(),
+                builder: (context, snapshot) {
+                  if (snapshot.data != null) {
+                    return Icon(
+                        snapshot.data! ? Icons.flash_on : Icons.flash_off);
+                  } else {
+                    return Container();
+                  }
                 },
-                icon: FutureBuilder<bool?>(
-                    future: controller?.getFlashStatus(),
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null) {
-                        return Icon(
-                            snapshot.data! ? Icons.flash_on : Icons.flash_off);
-                      } else {
-                        return Container();
-                      }
-                    }))
+              ),
+            ),
           ],
         ),
       );
@@ -114,8 +112,10 @@ class _QRScanPageState extends State<QRScanPage> {
       this.controller = controller;
     });
 
-    controller.scannedDataStream.listen((barCode) => setState(() {
-          this.barcode = barcode;
-        }));
+    controller.scannedDataStream.listen(
+      (barCode) => setState(() {
+        this.barcode = barCode;
+      }),
+    );
   }
 }
