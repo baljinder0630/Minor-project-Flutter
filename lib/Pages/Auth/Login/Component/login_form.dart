@@ -148,6 +148,11 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                   ? CircularProgressIndicator()
                   : Text(
                       "Login".toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
             ),
           ),

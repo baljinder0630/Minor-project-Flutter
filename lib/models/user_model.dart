@@ -6,12 +6,14 @@ class User {
   final String name;
   final String role;
   String? contactNumber;
+  List<String>? assignedPatients;
 
   User(
       {required this.email,
       required this.id,
       required this.name,
       required this.role,
+      this.assignedPatients,
       this.contactNumber});
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class User {
       'name': name,
       'role': role,
       'contactNumber': contactNumber,
+      'assignedPatients': assignedPatients,
     };
   }
 
@@ -31,6 +34,7 @@ class User {
       name: map['name'] as String,
       role: map['role'] as String,
       contactNumber: map['contactNumber'] as String,
+      assignedPatients: map['assignedPatients'] as List<String>,
     );
   }
 
@@ -41,6 +45,6 @@ class User {
 
   @override
   String toString() {
-    return 'User(email: $email, id: $id, name: $name, role: $role, contactNumber: $contactNumber)';
+    return 'User(email: $email, id: $id, name: $name, role: $role, contactNumber: $contactNumber assignedPatients: $assignedPatients)';
   }
 }

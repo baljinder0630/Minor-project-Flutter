@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors
+// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, use_build_context_synchronously, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/Auth/Login/login_screen.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';
@@ -36,6 +37,7 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
 
   @override
   Widget build(BuildContext context) {
+    final authStatus = ref.watch(authStateProvider).authStatus;
     return Form(
       key: _formkey,
       child: Padding(
@@ -161,7 +163,8 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
               // const SizedBox(height: defaultPadding / 2),
               ElevatedButton(
                 onPressed: () async {
-                  if (_formkey.currentState!.validate()) {
+                  if (authStatus != AuthStatus.processing &&
+                      _formkey.currentState!.validate()) {
                     final resp = await ref
                         .read(authStateProvider.notifier)
                         .signUp(
@@ -196,7 +199,11 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                     }
                   }
                 },
-                child: Text("Sign Up".toUpperCase()),
+                child: authStatus == AuthStatus.processing
+                    ? CircularProgressIndicator()
+                    : Text(
+                        "Sign Up".toUpperCase(),
+                      ),
               ),
             ],
           ),

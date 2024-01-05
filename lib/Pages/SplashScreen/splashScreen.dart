@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/nav.dart';
@@ -11,13 +13,9 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final appStatus = ref.listen(authStateProvider, (previous, next) {
+    ref.listen(authStateProvider, (previous, next) {
+      log("Listening ....." + next.appStatus.toString());
       if (next.appStatus == AppStatus.authenticated) {
         Navigator.pushReplacement(
           context,

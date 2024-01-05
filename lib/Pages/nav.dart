@@ -2,8 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/QrPages/ScanQrScreen.dart';
 import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
-import 'package:minor_project/Pages/QrPages/qrScannerPage.dart';
+import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/Pages/location/location_home.dart';
 import 'package:minor_project/to_do/app/app.dart';
@@ -17,26 +18,39 @@ class Nav extends ConsumerStatefulWidget {
 class _NavState extends ConsumerState<Nav> {
   int index = 0;
 
-  String? role = "patient";
+  String? role = "careTaker";
+  // String? role = "patient";
 
   @override
   Widget build(BuildContext context) {
-    // role = ref.watch(authStateProvider).user.role;
+    role = ref.watch(authStateProvider).user.role;
     log("Role: $role");
     const screen1 = [
       TodoHome(),
+      // GalleryPage(),
       Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+
       LocationHomePage(),
       QrCodePage()
     ];
     const screen2 = [
       TodoHome(),
       Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
-      QRScanPage()
+      ScanQrScreen()
     ];
     if (role == "careTaker") {
       return Scaffold(
         body: screen1[index],
+        floatingActionButton: CircleAvatar(
+          child: GestureDetector(
+            onLongPress: () {
+              ref.read(authStateProvider.notifier).logout();
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => const WelcomeScreen()));
+            },
+            child: const Icon(Icons.logout),
+          ),
+        ),
         bottomNavigationBar: NavigationBarTheme(
           data: const NavigationBarThemeData(
             indicatorColor: Colors.purple,
@@ -58,6 +72,16 @@ class _NavState extends ConsumerState<Nav> {
     } else if (role == "patient") {
       return Scaffold(
         body: screen2[index],
+        floatingActionButton: CircleAvatar(
+          child: GestureDetector(
+            onLongPress: () {
+              ref.read(authStateProvider.notifier).logout();
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => const WelcomeScreen()));
+            },
+            child: const Icon(Icons.logout),
+          ),
+        ),
         bottomNavigationBar: NavigationBarTheme(
           data: const NavigationBarThemeData(
             indicatorColor: Colors.purple,

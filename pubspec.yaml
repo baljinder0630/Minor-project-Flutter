@@ -58,6 +58,8 @@ dependencies:
   qr_bar_code: ^1.2.0
   shared_preferences: ^2.2.2
   qr_code_scanner: ^1.0.1
+  socket_io_client: ^2.0.3+1
+  connectivity_plus: ^5.0.2
 
 dev_dependencies:
   flutter_test:
