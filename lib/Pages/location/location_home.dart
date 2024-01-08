@@ -2,83 +2,26 @@
 
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
-import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:minor_project/Pages/location/googleMap.dart';
+import 'package:minor_project/Provider/socketProvider.dart';
 
-class LocationHomePage extends StatefulWidget {
+class LocationHomePage extends ConsumerStatefulWidget {
   const LocationHomePage({super.key});
 
   @override
-  State<LocationHomePage> createState() => _LocationHomePageState();
+  ConsumerState<LocationHomePage> createState() => _LocationHomePageState();
 }
 
-class _LocationHomePageState extends State<LocationHomePage> {
-  late Position _currentPosition;
-  double _distance = 0.0;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-    _getPatientLocation();
-    _timer =
-        Timer.periodic(Duration(seconds: 10), (timer) => _getPatientLocation());
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
-      setState(() {
-        _currentPosition = position;
-        // print(_currentPosition);
-      });
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
-
-  _getPatientLocation() async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://assistalzheimer.onrender.com/api/location/patient/?patientId=6526efe2c7925af873dacc6f'));
-
-      // print(response.body.toString());
-      var data = jsonDecode(response.body);
-      log(data["message"]);
-      if (data["success"] == true) {
-        double patientLatitude = double.parse(data['latitude']);
-        double patientLongitude = double.parse(data['longitude']);
-        _getCurrentLocation();
-        _distance = Geolocator.distanceBetween(
-          _currentPosition.latitude,
-          _currentPosition.longitude,
-          patientLatitude,
-          patientLongitude,
-        );
-        // print(_distance);
-        setState(() {});
-      }
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
+class _LocationHomePageState extends ConsumerState<LocationHomePage> {
   @override
   Widget build(BuildContext context) {
+    LatLng patientLocation =
+        ref.read(socketProvider.notifier).patientLocation ?? LatLng(0, 0);
+
     return Scaffold(
         body: Stack(
       children: [
@@ -96,21 +39,21 @@ class _LocationHomePageState extends State<LocationHomePage> {
             ),
             Center(
               child: Container(
-                width: 150,
-                height: 150,
+                width: 200,
+                height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: createGradient(_distance),
+                  gradient: createGradient(patientLocation.latitude),
                 ),
                 child: Center(
-                  child: _distance == 0.0
+                  child: 200 == 0.0
                       ? CircularProgressIndicator()
                       : Text(
-                          '${_distance.toInt()} m',
+                          '${patientLocation} m',
                           style: TextStyle(
                             // color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 14,
                           ),
                         ),
                 ),
@@ -120,7 +63,7 @@ class _LocationHomePageState extends State<LocationHomePage> {
               height: 20,
             ),
             Text(
-              "Patient is ${_distance.toInt()} m away from You",
+              "Patient is ${200.toInt()} m away from You",
               style:
                   TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
             ),
@@ -173,35 +116,12 @@ Gradient createGradient(double distance) {
   );
 }
 
-/*****************************************************
-   * 
-   * 
-  await _determinePosition().then((value) => log(value.toString()));
-   * 
-   *
-  final LocationSettings locationSettings = LocationSettings(
-    accuracy: LocationAccuracy.high,
-    distanceFilter: 100,
-  );
-  StreamSubscription<Position> positionStream =
-      Geolocator.getPositionStream(locationSettings: locationSettings)
-          .listen((Position? position) {
-    log(position == null
-        ? 'Unknown'
-        : '${position.latitude.toString()}, ${position.longitude.toString()}');
-  });
-   **************************************************/
-
 Future<Position> _determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
-  // Test if location services are enabled.
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
     return Future.error('Location services are disabled.');
   }
 
@@ -209,22 +129,14 @@ Future<Position> _determinePosition() async {
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
       return Future.error('Location permissions are denied');
     }
   }
 
   if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately.
     return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.');
   }
 
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
   return await Geolocator.getCurrentPosition();
 }

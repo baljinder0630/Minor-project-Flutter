@@ -1,5 +1,8 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:minor_project/constants.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScanPage extends StatefulWidget {
@@ -12,8 +15,8 @@ class QRScanPage extends StatefulWidget {
 class _QRScanPageState extends State<QRScanPage> {
   final qrKey = GlobalKey(debugLabel: 'QR');
 
-  Barcode? barcode;
   QRViewController? controller;
+  bool qrScanned = false;
 
   @override
   void dispose() {
@@ -33,26 +36,23 @@ class _QRScanPageState extends State<QRScanPage> {
   @override
   Widget build(BuildContext context) => SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            title: Text("Scan QR Code"),
+            centerTitle: true,
+            backgroundColor: kPrimaryColor,
+          ),
           body: Stack(
             alignment: Alignment.center,
             children: <Widget>[
               buildQrView(context),
-              Positioned(bottom: 10, child: buildResult()),
               Positioned(top: 10, child: buildControlButtons()),
+              if (qrScanned)
+                const Center(
+                    child: CircularProgressIndicator(
+                  color: kPrimaryColor,
+                ))
             ],
           ),
-        ),
-      );
-
-  Widget buildResult() => Container(
-        padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white24,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          barcode != null ? 'Result: ${barcode!.code}' : 'Scan a code',
-          maxLines: 3,
         ),
       );
 
@@ -112,10 +112,18 @@ class _QRScanPageState extends State<QRScanPage> {
       this.controller = controller;
     });
 
-    controller.scannedDataStream.listen(
-      (barCode) => setState(() {
-        this.barcode = barCode;
-      }),
-    );
+    controller.scannedDataStream.listen((barCode) {
+      if (barCode.code!.contains(host)) {
+        log("Qr scanned: ${barCode.code} ");
+        setState(() {
+          qrScanned = true;
+        });
+        controller.pauseCamera();
+        controller.dispose(); // Close the camera
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   Navigator.of(context).pop();
+        // });
+      }
+    });
   }
 }

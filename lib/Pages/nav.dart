@@ -2,8 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/Gallery/galleryPage.dart';
+import 'package:minor_project/Pages/QrPages/ScanQrScreen.dart';
 import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
-import 'package:minor_project/Pages/QrPages/qrScannerPage.dart';
+import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
+import 'package:minor_project/Provider/socketProvider.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/Pages/location/location_home.dart';
 import 'package:minor_project/to_do/app/app.dart';
@@ -17,26 +20,42 @@ class Nav extends ConsumerStatefulWidget {
 class _NavState extends ConsumerState<Nav> {
   int index = 0;
 
-  String? role = "patient";
+  Role? role;
+  // String? role = "patient";
 
   @override
   Widget build(BuildContext context) {
-    // role = ref.watch(authStateProvider).user.role;
+    ref.watch(socketProvider.notifier);
+
+    role = ref.watch(authStateProvider).role;
     log("Role: $role");
     const screen1 = [
       TodoHome(),
-      Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      // GalleryPage(),
+      // Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      GalleryPage(),
+
       LocationHomePage(),
-      QrCodePage()
+      // QrCodePage()
     ];
     const screen2 = [
       TodoHome(),
       Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
-      QRScanPage()
+      ScanQrScreen()
     ];
-    if (role == "careTaker") {
+    if (role == Role.careTaker) {
       return Scaffold(
         body: screen1[index],
+        floatingActionButton: CircleAvatar(
+          child: GestureDetector(
+            onLongPress: () {
+              ref.read(authStateProvider.notifier).logout();
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => const WelcomeScreen()));
+            },
+            child: const Icon(Icons.logout),
+          ),
+        ),
         bottomNavigationBar: NavigationBarTheme(
           data: const NavigationBarThemeData(
             indicatorColor: Colors.purple,
@@ -50,14 +69,26 @@ class _NavState extends ConsumerState<Nav> {
                 NavigationDestination(
                     icon: Icon(Icons.camera), label: "Gallery"),
                 NavigationDestination(icon: Icon(Icons.map), label: "Location"),
-                NavigationDestination(
-                    icon: Icon(Icons.qr_code), label: "QR Code")
+                // NavigationDestination(
+                //     icon: Icon(Icons.qr_code), label: "QR Code")
               ]),
         ),
       );
-    } else if (role == "patient") {
+    } else if (role == Role.patient) {
+      ref.watch(socketProvider.notifier).sendLocation();
+
       return Scaffold(
         body: screen2[index],
+        floatingActionButton: CircleAvatar(
+          child: GestureDetector(
+            onLongPress: () {
+              ref.read(authStateProvider.notifier).logout();
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => const WelcomeScreen()));
+            },
+            child: const Icon(Icons.logout),
+          ),
+        ),
         bottomNavigationBar: NavigationBarTheme(
           data: const NavigationBarThemeData(
             indicatorColor: Colors.purple,

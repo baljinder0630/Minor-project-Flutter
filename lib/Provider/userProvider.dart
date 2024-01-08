@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/constants.dart';
+import 'package:minor_project/models/assignedPatient.dart';
 import 'package:minor_project/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,8 @@ class UserAuth extends StateNotifier<AuthState> {
           user: User(email: '', id: '', name: '', role: '', contactNumber: ''),
           authStatus: AuthStatus.initial,
           appStatus: AppStatus.inital,
+          currentPatient: CurrentPatient(email: '', id: '', name: ''),
+          role: Role.initial,
         )) {
     checkAuthentication();
   }
@@ -41,7 +44,7 @@ class UserAuth extends StateNotifier<AuthState> {
       log(url);
       var header = {'Content-Type': 'application/json'};
 
-      final response = await http.post(
+      var response = await http.post(
         Uri.parse(url),
         headers: header,
         body: json.encode({'token': accessToken}),
@@ -53,19 +56,15 @@ class UserAuth extends StateNotifier<AuthState> {
         log("Call for refresh token");
         // var email = json.decode(response.body)["email"];
         String url2 = '$host/auth/refreshToken';
-        final response2 = await http.post(
+        response = await http.post(
           Uri.parse(url2),
           headers: header,
           body: json.encode({'refreshToken': refreshToken}),
         );
 
-        if (response2.statusCode == 200) {
-          state = state.copyWith(
-            appStatus: AppStatus.authenticated,
-          );
-          final newAccessToken = json.decode(response2.body)["newAccessToken"];
-          final newRefreshToken =
-              json.decode(response2.body)["newRefreshToken"];
+        if (response.statusCode == 200) {
+          final newAccessToken = json.decode(response.body)["newAccessToken"];
+          final newRefreshToken = json.decode(response.body)["newRefreshToken"];
           prefs.setString("AT", newAccessToken);
           prefs.setString("RT", newRefreshToken);
 
@@ -77,20 +76,22 @@ class UserAuth extends StateNotifier<AuthState> {
           log("Invalid Refresh Token");
         }
       }
+      var data = json.decode(response.body);
+      log(data.toString());
+      await getUserInfo(data["userId"], data["role"]);
+      if (state.role == Role.careTaker) await getAssignedPatients();
+      // await
       state = state.copyWith(
         appStatus: AppStatus.authenticated,
       );
-      var data = json.decode(response.body);
-      log(data.toString());
-      await getUserInfo(data["email"], data["role"]);
     } catch (e) {
       state = state.copyWith(appStatus: AppStatus.unauthenticated);
       print(e);
     }
   }
 
-  getUserInfo(String email, String role) async {
-    log("Email: $email Role: $role");
+  getUserInfo(String userId, String role) async {
+    log("UserId: $userId Role: $role");
     log("In Get User Info function");
     try {
       String url = '$host/profile/getUserInfo';
@@ -99,7 +100,7 @@ class UserAuth extends StateNotifier<AuthState> {
       final response = await http.post(
         Uri.parse(url),
         headers: header,
-        body: json.encode({'email': email, 'role': role}),
+        body: json.encode({'userId': userId, 'role': role}),
       );
 
       if (response.statusCode == 200) {
@@ -107,11 +108,12 @@ class UserAuth extends StateNotifier<AuthState> {
         log(data.toString());
         state = state.copyWith(
           user: User(
-            email: email,
-            id: data["id"],
+            email: data["email"],
+            id: data["userId"],
             name: data["name"],
             role: role.toString(),
           ),
+          role: role == "patient" ? Role.patient : Role.careTaker,
         );
 
         log("User: ${state.user}");
@@ -150,8 +152,8 @@ class UserAuth extends StateNotifier<AuthState> {
 
       if (response.statusCode == 200) {
         log("Signup successful");
+        await signIn(email: email, password: password, role: role);
         state = state.copyWith(authStatus: AuthStatus.processed);
-        await getUserInfo(email, role);
         return {"success": true, "message": "User created successfully"};
       } else {
         log("Signup unsuccessful");
@@ -184,18 +186,23 @@ class UserAuth extends StateNotifier<AuthState> {
         }),
       );
 
-      log(json.decode(response.body)["message"] ?? "No message at signin");
-
-      if (response.statusCode == 200) {
-        log("Signin successful");
-        state = state.copyWith(authStatus: AuthStatus.processed);
+      final data = json.decode(response.body);
+      log(data.toString());
+      if (data["success"]) {
         final data = jsonDecode(response.body);
-        final accessToken = data["accessToken"];
-        final refreshToken = data["refreshToken"];
+        final accessToken = data["accessToken"] ?? "";
+        final refreshToken = data["refreshToken"] ?? "";
+
+        state = state.copyWith(authStatus: AuthStatus.processed);
+        state = state.copyWith(appStatus: AppStatus.authenticated);
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("AT", accessToken);
         await prefs.setString("RT", refreshToken);
-        await getUserInfo(email, role);
+
+        log("Signin successful");
+        await getUserInfo(data["userId"], role);
+        // checkAuthentication();
         return {"success": true, "message": "User signed in successfully"};
       } else {
         log("Signin unsuccessful");
@@ -208,32 +215,149 @@ class UserAuth extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> allocateCareTaker(String url) async {
+    url += "patientId=" + state.user.id;
+    log(url);
+
+    try {
+      var header = {'Content-Type': 'application/json'};
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: header,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        log("Inside allocate caretaker 200 case" + data["message"]);
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
+  getAssignedPatients() async {
+    try {
+      String url = '$host/patientAssigned?caretakerId=${state.user.id}';
+      log(url);
+      var header = {'Content-Type': 'application/json'};
+      final response = await http.get(
+        Uri.parse(url),
+        headers: header,
+      );
+      log(response.body);
+      final data = json.decode(response.body);
+      if (data["success"] == true) {
+        state = state.copyWith(
+            user: User(
+          email: state.user.email,
+          id: state.user.id,
+          name: state.user.name,
+          role: state.user.role,
+          assignedPatients: data["patientIds"],
+        ));
+        // data["patientIds"];
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<Map<String, dynamic>> getPatientInfo(
+      String userId, String role) async {
+    log("UserId: $userId Role: $role");
+    log("In Get User Info function");
+    try {
+      String url = '$host/profile/getUserInfo';
+      var header = {'Content-Type': 'application/json'};
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: header,
+        body: json.encode({'userId': userId, 'role': role}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        log(data.toString());
+
+        log("User: ${state.user}");
+        return {
+          "email": data["email"],
+          "name": data["name"],
+          "userId": userId,
+          "role": role.toString(),
+        };
+      }
+
+      log("User info not found");
+      return {
+        "email": "",
+        "name": "",
+        "role": "",
+      };
+    } catch (e) {
+      log(e.toString());
+      return {
+        "email": "",
+        "name": "",
+        "role": "",
+      };
+    }
+  }
+
+  selectCurrentPatient(CurrentPatient currentPatient) {
+    state = state.copyWith(currentPatient: currentPatient);
+  }
+
   // TODO: Implement logout
+  Future<void> logout() async {
+    log("In logout function");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // final refreshToken = prefs.getString("RT");
+    await prefs.clear();
+    state = state.copyWith(appStatus: AppStatus.unauthenticated);
+  }
 }
 
 class AuthState {
   User user;
   AuthStatus? authStatus;
   AppStatus? appStatus;
+  CurrentPatient? currentPatient;
+  Role role;
 
   AuthState({
     required this.user,
     this.authStatus,
     this.appStatus,
+    this.currentPatient,
+    required this.role,
   });
 
   AuthState copyWith({
     User? user,
     AuthStatus? authStatus,
     AppStatus? appStatus,
+    CurrentPatient? currentPatient,
+    Role? role,
   }) {
     return AuthState(
       user: user ?? this.user,
       authStatus: authStatus ?? this.authStatus,
       appStatus: appStatus ?? this.appStatus,
+      currentPatient: currentPatient ?? this.currentPatient,
+      role: role ?? this.role,
     );
   }
 }
+
+enum Role { initial, patient, careTaker }
 
 enum AuthStatus { initial, processing, processed, error }
 
