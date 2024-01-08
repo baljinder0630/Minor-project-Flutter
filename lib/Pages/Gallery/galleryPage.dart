@@ -1,22 +1,20 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Provider/socketProvider.dart';
 
-main() {
-  // Dart client
-  IO.Socket socket = IO.io('http://192.168.101.5:5000', <String, dynamic>{
-    'transports': ['websocket'],
-    'autoConnect': false
-  });
-  socket.connect();
-  socket.onConnect((data) {
-    socket.emit('updateLocation', {
-      "lat": 64524235,
-      "long": 23221,
-      "userId": "6593dc206342a2d7242067cd",
-      "careTakerId": "6583ead050b5596880c25afd"
-    });
-    socket.emit('registerSocket',
-        {"userId": "6593dc206342a2d7242067cd", "role": "patient"});
+class GalleryPage extends ConsumerStatefulWidget {
+  const GalleryPage({super.key});
 
-    // socket.on('/registerSocket', (data) => print("Location updated: $data"));
-  });
+  @override
+  ConsumerState<GalleryPage> createState() => _GalleryPageState();
+}
+
+class _GalleryPageState extends ConsumerState<GalleryPage> {
+  @override
+  Widget build(BuildContext context) {
+    // ref.listen(socketProvider, ((previous, next) => print(next)));
+    // ref.watch(socketProvider.notifier).listenLocation();
+    // ref.watch(socketProvider.notifier).sendLocation();
+    return Container();
+  }
 }

@@ -1,12 +1,11 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, sized_box_for_whitespace, avoid_unnecessary_containers
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';
-import 'package:minor_project/models/user_model.dart';
+import 'package:minor_project/models/assignedPatient.dart';
 import 'package:qr_bar_code/qr/qr.dart';
 
 class QrCodePage extends ConsumerStatefulWidget {
@@ -17,22 +16,22 @@ class QrCodePage extends ConsumerStatefulWidget {
 }
 
 class _QrCodePageState extends ConsumerState<QrCodePage> {
-  List<dynamic> assignedPatients = [];
   @override
   void initState() {
     // TODO: implement initState
     // getAssignedPatients();
+
     super.initState();
   }
 
-  getAssignedPatients() async {
-    assignedPatients =
-        await ref.watch(authStateProvider.notifier).getAssignedPatients();
+  refresh() async {
+    await ref.watch(authStateProvider.notifier).getAssignedPatients();
   }
 
   @override
   Widget build(BuildContext context) {
-    getAssignedPatients();
+    final assignedPatients =
+        ref.watch(authStateProvider.notifier).state.user.assignedPatients ?? [];
     final careTakerId = ref.watch(authStateProvider).user.id;
 
     return Scaffold(
@@ -50,9 +49,13 @@ class _QrCodePageState extends ConsumerState<QrCodePage> {
                           "/allocateCaretaker/?caretakerId=$careTakerId&")),
               SizedBox(height: 20),
               Text("Scan the QR Code from Patient's app"),
-              Container(
-                child: Expanded(
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await refresh();
+                  },
                   child: ListView.builder(
+                    physics: AlwaysScrollableScrollPhysics(),
                     itemCount: assignedPatients.length,
                     itemBuilder: (context, index) {
                       return FutureBuilder(
@@ -68,6 +71,17 @@ class _QrCodePageState extends ConsumerState<QrCodePage> {
                             return Text('Error: ${snapshot.error}');
                           } else {
                             return ListTile(
+                              onTap: () {
+                                ref
+                                    .watch(authStateProvider.notifier)
+                                    .selectCurrentPatient(CurrentPatient(
+                                        name: snapshot.data["name"],
+                                        email: snapshot.data["email"],
+                                        id: snapshot.data["userId"]));
+
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => Nav()));
+                              },
                               title: Text(snapshot.data["name"]),
                               subtitle: Text(snapshot.data["email"]),
                             );

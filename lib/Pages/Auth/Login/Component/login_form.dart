@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/Auth/Signup/signup_screen.dart';
-import 'package:minor_project/Pages/already_have_an_account_acheck.dart';
+import 'package:minor_project/Pages/Auth/Component/already_have_an_account_acheck.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';

@@ -2,8 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/QrPages/ScanQrScreen.dart';
+import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
+import 'package:minor_project/Provider/socketProvider.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -16,13 +19,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Widget build(BuildContext context) {
     ref.listen(authStateProvider, (previous, next) {
       log("Listening ....." + next.appStatus.toString());
+      log(next.user.toString());
       if (next.appStatus == AppStatus.authenticated) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Nav(),
-          ),
-        );
+        print("here");
+        if (ref.watch(authStateProvider).user.role == 'careTaker') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => QrCodePage(),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Nav(),
+            ),
+          );
+        }
       } else if (next.appStatus == AppStatus.unauthenticated) {
         Navigator.pushReplacement(
           context,

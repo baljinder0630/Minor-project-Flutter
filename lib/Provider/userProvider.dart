@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/constants.dart';
+import 'package:minor_project/models/assignedPatient.dart';
 import 'package:minor_project/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,8 @@ class UserAuth extends StateNotifier<AuthState> {
           user: User(email: '', id: '', name: '', role: '', contactNumber: ''),
           authStatus: AuthStatus.initial,
           appStatus: AppStatus.inital,
+          currentPatient: CurrentPatient(email: '', id: '', name: ''),
+          role: Role.initial,
         )) {
     checkAuthentication();
   }
@@ -60,9 +63,6 @@ class UserAuth extends StateNotifier<AuthState> {
         );
 
         if (response.statusCode == 200) {
-          state = state.copyWith(
-            appStatus: AppStatus.authenticated,
-          );
           final newAccessToken = json.decode(response.body)["newAccessToken"];
           final newRefreshToken = json.decode(response.body)["newRefreshToken"];
           prefs.setString("AT", newAccessToken);
@@ -76,12 +76,14 @@ class UserAuth extends StateNotifier<AuthState> {
           log("Invalid Refresh Token");
         }
       }
-      state = state.copyWith(
-        appStatus: AppStatus.authenticated,
-      );
       var data = json.decode(response.body);
       log(data.toString());
       await getUserInfo(data["userId"], data["role"]);
+      if (state.role == Role.careTaker) await getAssignedPatients();
+      // await
+      state = state.copyWith(
+        appStatus: AppStatus.authenticated,
+      );
     } catch (e) {
       state = state.copyWith(appStatus: AppStatus.unauthenticated);
       print(e);
@@ -111,6 +113,7 @@ class UserAuth extends StateNotifier<AuthState> {
             name: data["name"],
             role: role.toString(),
           ),
+          role: role == "patient" ? Role.patient : Role.careTaker,
         );
 
         log("User: ${state.user}");
@@ -119,48 +122,6 @@ class UserAuth extends StateNotifier<AuthState> {
       log("User info not found");
     } catch (e) {
       log(e.toString());
-    }
-  }
-
-  Future<Map<String, dynamic>> getPatientInfo(
-      String userId, String role) async {
-    log("UserId: $userId Role: $role");
-    log("In Get User Info function");
-    try {
-      String url = '$host/profile/getUserInfo';
-      var header = {'Content-Type': 'application/json'};
-
-      final response = await http.post(
-        Uri.parse(url),
-        headers: header,
-        body: json.encode({'userId': userId, 'role': role}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        log(data.toString());
-
-        log("User: ${state.user}");
-        return {
-          "email": data["email"],
-          "name": data["name"],
-          "role": role.toString(),
-        };
-      }
-
-      log("User info not found");
-      return {
-        "email": "",
-        "name": "",
-        "role": "",
-      };
-    } catch (e) {
-      log(e.toString());
-      return {
-        "email": "",
-        "name": "",
-        "role": "",
-      };
     }
   }
 
@@ -226,7 +187,7 @@ class UserAuth extends StateNotifier<AuthState> {
       );
 
       final data = json.decode(response.body);
-
+      log(data.toString());
       if (data["success"]) {
         final data = jsonDecode(response.body);
         final accessToken = data["accessToken"] ?? "";
@@ -280,7 +241,7 @@ class UserAuth extends StateNotifier<AuthState> {
     }
   }
 
-  Future<List<dynamic>> getAssignedPatients() async {
+  getAssignedPatients() async {
     try {
       String url = '$host/patientAssigned?caretakerId=${state.user.id}';
       log(url);
@@ -292,14 +253,66 @@ class UserAuth extends StateNotifier<AuthState> {
       log(response.body);
       final data = json.decode(response.body);
       if (data["success"] == true) {
-        return data["patientIds"];
-      } else {
-        return [];
+        state = state.copyWith(
+            user: User(
+          email: state.user.email,
+          id: state.user.id,
+          name: state.user.name,
+          role: state.user.role,
+          assignedPatients: data["patientIds"],
+        ));
+        // data["patientIds"];
       }
     } catch (e) {
       log(e.toString());
-      return [];
     }
+  }
+
+  Future<Map<String, dynamic>> getPatientInfo(
+      String userId, String role) async {
+    log("UserId: $userId Role: $role");
+    log("In Get User Info function");
+    try {
+      String url = '$host/profile/getUserInfo';
+      var header = {'Content-Type': 'application/json'};
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: header,
+        body: json.encode({'userId': userId, 'role': role}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        log(data.toString());
+
+        log("User: ${state.user}");
+        return {
+          "email": data["email"],
+          "name": data["name"],
+          "userId": userId,
+          "role": role.toString(),
+        };
+      }
+
+      log("User info not found");
+      return {
+        "email": "",
+        "name": "",
+        "role": "",
+      };
+    } catch (e) {
+      log(e.toString());
+      return {
+        "email": "",
+        "name": "",
+        "role": "",
+      };
+    }
+  }
+
+  selectCurrentPatient(CurrentPatient currentPatient) {
+    state = state.copyWith(currentPatient: currentPatient);
   }
 
   // TODO: Implement logout
@@ -316,25 +329,35 @@ class AuthState {
   User user;
   AuthStatus? authStatus;
   AppStatus? appStatus;
+  CurrentPatient? currentPatient;
+  Role role;
 
   AuthState({
     required this.user,
     this.authStatus,
     this.appStatus,
+    this.currentPatient,
+    required this.role,
   });
 
   AuthState copyWith({
     User? user,
     AuthStatus? authStatus,
     AppStatus? appStatus,
+    CurrentPatient? currentPatient,
+    Role? role,
   }) {
     return AuthState(
       user: user ?? this.user,
       authStatus: authStatus ?? this.authStatus,
       appStatus: appStatus ?? this.appStatus,
+      currentPatient: currentPatient ?? this.currentPatient,
+      role: role ?? this.role,
     );
   }
 }
+
+enum Role { initial, patient, careTaker }
 
 enum AuthStatus { initial, processing, processed, error }
 

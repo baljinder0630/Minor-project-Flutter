@@ -6,7 +6,7 @@ class User {
   final String name;
   final String role;
   String? contactNumber;
-  List<String>? assignedPatients;
+  List<dynamic>? assignedPatients;
 
   User(
       {required this.email,
