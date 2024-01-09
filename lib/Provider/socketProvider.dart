@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:minor_project/Provider/userProvider.dart';
+import 'package:minor_project/to_do/data/data.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:developer';
 
@@ -116,5 +117,14 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
     state.onDisconnect((_) {
       log('Disconnected from socket');
     });
+  }
+
+  void assignTask(String patientId, Task task) {
+    if (!mounted) return;
+    if (this.userId == null || this.role == null) {
+      log("empty user id or role in assignTask");
+      return;
+    }
+    state.emit('assignTask', {'userId': patientId, 'task': task});
   }
 }
