@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../utils/utils.dart';
 import '../../data/data.dart';
 import 'package:path/path.dart';
@@ -33,18 +35,20 @@ class TaskDatasource {
   void _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE ${AppKeys.dbTable} (
-        ${TaskKeys.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${TaskKeys.id} TEXT PRIMARY KEY ,
         ${TaskKeys.title} TEXT,
         ${TaskKeys.note} TEXT,
         ${TaskKeys.date} TEXT,
         ${TaskKeys.time} TEXT,
         ${TaskKeys.category} TEXT,
+        ${TaskKeys.assignedBy} TEXT,
         ${TaskKeys.isCompleted} INTEGER
       )
     ''');
   }
 
   Future<int> addTask(Task task) async {
+    log(task.id.toString());
     final db = await database;
     return db.transaction((txn) async {
       return await txn.insert(
@@ -59,7 +63,7 @@ class TaskDatasource {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       AppKeys.dbTable,
-      orderBy: "id DESC",
+      orderBy: "date DESC",
     );
     return List.generate(
       maps.length,
@@ -92,5 +96,11 @@ class TaskDatasource {
         );
       },
     );
+  }
+
+  // clear database
+  Future<void> clearDatabase() async {
+    final db = await database;
+    await db.delete(AppKeys.dbTable);
   }
 }

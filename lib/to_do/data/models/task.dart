@@ -2,12 +2,13 @@ import 'package:equatable/equatable.dart';
 import '../../utils/utils.dart';
 
 class Task extends Equatable {
-  final int? id;
+  final String? id;
   final String title;
   final String note;
   final TaskCategory category;
   final String time;
   final String date;
+  final String assignedBy;
   final bool isCompleted;
   const Task({
     this.id,
@@ -16,6 +17,7 @@ class Task extends Equatable {
     required this.time,
     required this.date,
     required this.note,
+    required this.assignedBy,
     required this.isCompleted,
   });
 
@@ -27,6 +29,7 @@ class Task extends Equatable {
       TaskKeys.category: category.name,
       TaskKeys.time: time,
       TaskKeys.date: date,
+      TaskKeys.assignedBy: assignedBy,
       TaskKeys.isCompleted: isCompleted ? 1 : 0,
     };
   }
@@ -39,6 +42,7 @@ class Task extends Equatable {
       category: TaskCategory.stringToTaskCategory(map[TaskKeys.category]),
       time: map[TaskKeys.time],
       date: map[TaskKeys.date],
+      assignedBy: map[TaskKeys.assignedBy],
       isCompleted: map[TaskKeys.isCompleted] == 1 ? true : false,
     );
   }
@@ -51,17 +55,19 @@ class Task extends Equatable {
       category,
       time,
       date,
+      assignedBy,
       isCompleted,
     ];
   }
 
   Task copyWith({
-    int? id,
+    String? id,
     String? title,
     String? note,
     TaskCategory? category,
     String? time,
     String? date,
+    String? assignedBy,
     bool? isCompleted,
   }) {
     return Task(
@@ -71,6 +77,7 @@ class Task extends Equatable {
       category: category ?? this.category,
       time: time ?? this.time,
       date: date ?? this.date,
+      assignedBy: assignedBy ?? this.assignedBy,
       isCompleted: isCompleted ?? this.isCompleted,
     );
   }

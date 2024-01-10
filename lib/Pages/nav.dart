@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/Gallery/galleryPage.dart';
 import 'package:minor_project/Pages/QrPages/ScanQrScreen.dart';
-import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
-import 'package:minor_project/Pages/Todo/todoHome.dart';
 import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
 import 'package:minor_project/Provider/socketProvider.dart';
 import 'package:minor_project/Provider/userProvider.dart';
@@ -31,8 +29,7 @@ class _NavState extends ConsumerState<Nav> {
     role = ref.watch(authStateProvider).role;
     log("Role: $role");
     const screen1 = [
-      ToDoHomePage(),
-      // TodoHome(),
+      TodoHome(),
       // GalleryPage(),
       // Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
       GalleryPage(),
@@ -41,10 +38,8 @@ class _NavState extends ConsumerState<Nav> {
       // QrCodePage()
     ];
     const screen2 = [
-      ToDoHomePage(),
       TodoHome(),
-
-      // Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
       ScanQrScreen()
     ];
     if (role == Role.careTaker) {

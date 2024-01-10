@@ -39,6 +39,15 @@ class TaskNotifier extends StateNotifier<TaskState> {
     }
   }
 
+  Future<void> clearDb() async {
+    try {
+      await _repository.clearDatabase();
+      getTasks();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   void getTasks() async {
     try {
       final tasks = await _repository.getAllTasks();

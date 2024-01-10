@@ -39,4 +39,13 @@ class TaskRepositoryImpl implements TaskRepository {
       throw '$e';
     }
   }
+
+  @override
+  Future<void> clearDatabase() async {
+    try {
+      await _datasource.clearDatabase();
+    } catch (e) {
+      throw '$e';
+    }
+  }
 }

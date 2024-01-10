@@ -25,6 +25,6 @@ main() async {
       "timestamp": 1331161200
     });
 
-    socket.on("assignTask", (data) => print(data.toString()));
+    socket.on("tasksFromCareTaker", (data) => print(data.toString()));
   });
 }

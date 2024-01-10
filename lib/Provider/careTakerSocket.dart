@@ -8,7 +8,10 @@ main() {
   IO.Socket socket = IO.io(
       'http://192.168.101.5:5000',
       // IO.Socket socket = IO.io('https://assistalzheimer.onrender.com',
-      IO.OptionBuilder().setTransports(['websocket']).build());
+      IO.OptionBuilder().setTransports(['websocket']).setAuth({
+        'role': "careTaker",
+        'userId': "6583ead050b5596880c25afd",
+      }).build());
   socket.connect();
   socket.onConnect(
     (_) {
@@ -18,17 +21,11 @@ main() {
 
       socket.on('updateLocation', (data) => print(data.toString()));
 
-      // socket.emit("assignTask", {
-      //   "userId": "6583ead050b5596880c25afd",
-      //   "Take": Task(
-      //           title: "Homework",
-      //           category: TaskCategory.personal,
-      //           time: DateTime.now().toString(),
-      //           date: DateTime.now().toString(),
-      //           note: "Have to complete this by tommorrow",
-      //           isCompleted: false)
-      //       .toJson()
-      // });
+      socket.emit("assignTaskToPatient", {
+        "userId": "6583ead050b5596880c25afd",
+        "patientId": "6593dc206342a2d7242067cd",
+        "task": "Take medicine",
+      });
     },
   );
 }
