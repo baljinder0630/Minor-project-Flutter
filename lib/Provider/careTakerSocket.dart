@@ -16,16 +16,28 @@ main() {
   socket.onConnect(
     (_) {
       print(socket.connected.toString());
-      socket.emit('registerSocket',
-          {'role': "careTaker", 'userId': "6583ead050b5596880c25afd"});
 
       socket.on('updateLocation', (data) => print(data.toString()));
 
-      socket.emit("assignTaskToPatient", {
-        "userId": "6583ead050b5596880c25afd",
-        "patientId": "6593dc206342a2d7242067cd",
-        "task": "Take medicine",
-      });
+      Future.delayed(
+        Duration(seconds: 3),
+        () {
+          socket.emit("assignTaskToPatient", {
+            "from": "6583ead050b5596880c25afd",
+            "to": "6593dc206342a2d7242067cd",
+            "task": {
+              "id": "1234567890",
+              "title": "Take Medicine",
+              "note": "Take medicine at 10:00 AM",
+              "category": "Medicine",
+              "time": "10:00 AM",
+              "date": "2021-06-30",
+              "assignedBy": "6583ead050b5596880c25afd",
+              "isCompleted": false
+            }
+          });
+        },
+      );
     },
   );
 }

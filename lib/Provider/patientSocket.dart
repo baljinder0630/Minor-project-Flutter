@@ -14,17 +14,16 @@ main() async {
   socket.connect();
   socket.onConnect((_) {
     print('connect');
-    // socket.emit('registerSocket',
-    //     {'role': "patient", 'userId': "6593dc206342a2d7242067cd"});
-
-    socket.emit("updateLocation", {
-      "userId": "6593dc206342a2d7242067cd",
-      // "careTakerId": "6583ead050b5596880c25afd",
-      "latitude": 37.4219983,
-      "longitude": -122.084,
-      "timestamp": 1331161200
-    });
 
     socket.on("tasksFromCareTaker", (data) => print(data.toString()));
+    Future.delayed(Duration(seconds: 2), () {
+      socket.emit("updateLocation", {
+        "userId": "6593dc206342a2d7242067cd",
+        // "careTakerId": "6583ead050b5596880c25afd",
+        "latitude": 37.4219983,
+        "longitude": -122.084,
+        "timestamp": 1331161200
+      });
+    });
   });
 }
