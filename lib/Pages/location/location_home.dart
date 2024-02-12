@@ -25,7 +25,7 @@ class _LocationHomePageState extends ConsumerState<LocationHomePage> {
     return Scaffold(
         body: Stack(
       children: [
-        Container(
+        SizedBox(
             height: double.infinity,
             child: Image.asset(
               'assets/images/gmap.webp',
@@ -49,7 +49,7 @@ class _LocationHomePageState extends ConsumerState<LocationHomePage> {
                   child: 200 == 0.0
                       ? CircularProgressIndicator()
                       : Text(
-                          '${patientLocation} m',
+                          '$patientLocation m',
                           style: TextStyle(
                             // color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ Gradient createGradient(double distance) {
 
   return RadialGradient(
     colors: [innerColor, startColor, endColor],
-    stops: [0.0, 0.4, 1.0],
+    stops: const [0.0, 0.4, 1.0],
     center: Alignment.center,
     radius: 0.7,
     focal: Alignment.center,

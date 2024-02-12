@@ -219,7 +219,7 @@ class UserAuth extends StateNotifier<AuthState> {
   }
 
   Future<bool> allocateCareTaker(String url) async {
-    url += "patientId=" + state.user.id;
+    url += "patientId=${state.user.id}";
     log(url);
 
     try {

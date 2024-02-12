@@ -20,7 +20,7 @@ main() {
       socket.on('updateLocation', (data) => print(data.toString()));
 
       Future.delayed(
-        Duration(seconds: 3),
+        const Duration(seconds: 3),
         () {
           socket.emit("assignTaskToPatient", {
             "from": "6583ead050b5596880c25afd",

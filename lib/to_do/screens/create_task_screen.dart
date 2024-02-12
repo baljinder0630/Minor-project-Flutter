@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -101,7 +100,7 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
     final category = ref.watch(categoryProvider);
     if (title.isNotEmpty) {
       final task = Task(
-        id: Uuid().v1() + user.id.toString(),
+        id: const Uuid().v1() + user.id.toString(),
         title: title,
         category: category,
         time: Helpers.timeToString(time),

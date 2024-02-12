@@ -12,6 +12,8 @@ import 'package:minor_project/to_do/app/app.dart';
 import 'package:flutter/material.dart';
 
 class Nav extends ConsumerStatefulWidget {
+  const Nav({super.key});
+
   @override
   _NavState createState() => _NavState();
 }

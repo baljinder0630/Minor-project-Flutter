@@ -22,12 +22,14 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
   LatLng? patientLocation;
   String role;
   String userId;
+  @override
   bool mounted = true;
   StreamSubscription<Position>? positionStreamSubscription;
 
   SocketNotifier({required this.role, required this.userId, required this.ref})
       : super(IO.io(
-            'http://192.168.101.5:5000',
+            // 'http://192.168.101.5:5000',
+            'https://assistalzheimer.onrender.com',
             IO.OptionBuilder().setTransports(['websocket']).setAuth({
               'role': role,
               'userId': userId,
@@ -113,7 +115,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
 
   void sendLocation() {
     if (!mounted) return;
-    if (this.userId == null || this.role == null) {
+    if (role == null) {
       log("empty user id or role in sendLocation");
       return;
     }
@@ -142,8 +144,8 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
         state.emit('updateLocation', {
           'latitude': position.latitude,
           'longitude': position.longitude,
-          'role': this.role,
-          'userId': this.userId,
+          'role': role,
+          'userId': userId,
         });
         // }
         log(position == null
@@ -172,7 +174,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
   void assignTaskToPatient(Task task, String from, String to) {
     log("In assignTaskToPatient");
     if (!mounted) return;
-    if (this.userId == null || this.role == null) {
+    if (role == null) {
       log("empty user id or role in assignTaskToPatient");
       return;
     }
