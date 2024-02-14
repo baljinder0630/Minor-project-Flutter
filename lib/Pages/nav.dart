@@ -41,7 +41,8 @@ class _NavState extends ConsumerState<Nav> {
     ];
     const screen2 = [
       TodoHome(),
-      Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      // Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      GalleryPage(),
       ScanQrScreen()
     ];
     if (role == Role.careTaker) {

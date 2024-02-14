@@ -44,7 +44,7 @@ class _QRScanPageState extends State<QRScanPage> {
             alignment: Alignment.center,
             children: <Widget>[
               buildQrView(context),
-              Positioned(top: 10, child: buildControlButtons()),
+              Positioned(top: 10, child: buildControlButtons(),),
               if (qrScanned)
                 const Center(
                     child: CircularProgressIndicator(
@@ -126,3 +126,4 @@ class _QRScanPageState extends State<QRScanPage> {
     });
   }
 }
+
