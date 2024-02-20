@@ -34,6 +34,7 @@ class GalleryPage extends ConsumerStatefulWidget {
 
 class _GalleryPageState extends ConsumerState<GalleryPage> {
   List<File> images = [];
+  List<String> imageNames = [];
 
   Future<void> _getImageFromDevice() async {
     final picker = ImagePicker();
@@ -41,6 +42,47 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
     if (pickedFile != null) {
       setState(() {
         images.add(File(pickedFile.path));
+        imageNames.add(pickedFile.path.split('/').last);
+      });
+    }
+  }
+
+  Future<void> _changeImageName(int index) async {
+    TextEditingController controller = TextEditingController();
+
+    String? newName = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Change Image Name'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'Enter new name'),
+            onChanged: (value) {
+              // Handle onChanged event if needed
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(controller.text);
+              },
+              child: Text('Change'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newName != null && newName.isNotEmpty) {
+      setState(() {
+        imageNames[index] = newName;
       });
     }
   }
@@ -62,7 +104,7 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
         itemBuilder: (context, index) {
           return InkWell(
             onTap: () {
-              // Action to perform when an image is tapped
+              _changeImageName(index);
             },
             child: Card(
               child: Column(
@@ -76,7 +118,7 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    images[index].path.split('/').last,
+                    imageNames[index],
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
@@ -84,6 +126,7 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
                     onPressed: () {
                       setState(() {
                         images.removeAt(index);
+                        imageNames.removeAt(index);
                       });
                     },
                     child: Icon(Icons.remove),
@@ -107,6 +150,8 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
     );
   }
 }
+
+
 
 // import 'dart:io';
 
