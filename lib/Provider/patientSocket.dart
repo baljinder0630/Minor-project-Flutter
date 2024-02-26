@@ -16,7 +16,7 @@ main() async {
     print('connect');
 
     socket.on("tasksFromCareTaker", (data) => print(data.toString()));
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       socket.emit("updateLocation", {
         "userId": "6593dc206342a2d7242067cd",
         // "careTakerId": "6583ead050b5596880c25afd",

@@ -12,6 +12,8 @@ import 'package:minor_project/to_do/app/app.dart';
 import 'package:flutter/material.dart';
 
 class Nav extends ConsumerStatefulWidget {
+  const Nav({super.key});
+
   @override
   _NavState createState() => _NavState();
 }
@@ -39,7 +41,8 @@ class _NavState extends ConsumerState<Nav> {
     ];
     const screen2 = [
       TodoHome(),
-      Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      // Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      GalleryPage(),
       ScanQrScreen()
     ];
     if (role == Role.careTaker) {

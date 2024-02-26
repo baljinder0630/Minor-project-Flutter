@@ -33,7 +33,7 @@ class DisplayListOfTasks extends ConsumerWidget {
               ),
             )
           : ListView.separated(
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
               itemCount: tasks.length,
               padding: EdgeInsets.zero,

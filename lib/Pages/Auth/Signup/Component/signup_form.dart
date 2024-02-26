@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:minor_project/Pages/Auth/Login/login_screen.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';

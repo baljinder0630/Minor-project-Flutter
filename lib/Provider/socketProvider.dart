@@ -22,6 +22,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
   LatLng? patientLocation;
   String role;
   String userId;
+  @override
   bool mounted = true;
   StreamSubscription<Position>? positionStreamSubscription;
 
@@ -116,7 +117,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
 
   void sendLocation() {
     if (!mounted) return;
-    if (this.userId == null || this.role == null) {
+    if (role == null) {
       log("empty user id or role in sendLocation");
       return;
     }
@@ -145,8 +146,8 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
         state.emit('updateLocation', {
           'latitude': position.latitude,
           'longitude': position.longitude,
-          'role': this.role,
-          'userId': this.userId,
+          'role': role,
+          'userId': userId,
         });
         // }
         log(position == null
@@ -175,7 +176,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
   void assignTaskToPatient(Task task, String from, String to) {
     log("In assignTaskToPatient");
     if (!mounted) return;
-    if (this.userId == null || this.role == null) {
+    if (role == null) {
       log("empty user id or role in assignTaskToPatient");
       return;
     }

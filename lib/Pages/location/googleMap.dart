@@ -28,7 +28,7 @@ class GoogleMapPageState extends State<GoogleMapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         height: 500,
         width: 100,
         child: GoogleMap(

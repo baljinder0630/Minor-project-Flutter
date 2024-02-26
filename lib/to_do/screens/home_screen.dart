@@ -30,7 +30,7 @@ class HomeScreen extends ConsumerWidget {
           AppBackground(
             headerHeight: deviceSize.height * 0.3,
             header: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

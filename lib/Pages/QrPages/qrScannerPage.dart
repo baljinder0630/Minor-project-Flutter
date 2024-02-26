@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minor_project/constants.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -37,7 +36,7 @@ class _QRScanPageState extends State<QRScanPage> {
   Widget build(BuildContext context) => SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: Text("Scan QR Code"),
+            title: const Text("Scan QR Code"),
             centerTitle: true,
             backgroundColor: kPrimaryColor,
           ),
@@ -45,7 +44,7 @@ class _QRScanPageState extends State<QRScanPage> {
             alignment: Alignment.center,
             children: <Widget>[
               buildQrView(context),
-              Positioned(top: 10, child: buildControlButtons()),
+              Positioned(top: 10, child: buildControlButtons(),),
               if (qrScanned)
                 const Center(
                     child: CircularProgressIndicator(
@@ -57,7 +56,7 @@ class _QRScanPageState extends State<QRScanPage> {
       );
 
   Widget buildControlButtons() => Container(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: Colors.white24,
@@ -68,7 +67,7 @@ class _QRScanPageState extends State<QRScanPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             IconButton(
-              icon: Icon(Icons.switch_camera),
+              icon: const Icon(Icons.switch_camera),
               onPressed: () async {
                 await controller?.flipCamera();
                 setState(() {});
@@ -127,3 +126,4 @@ class _QRScanPageState extends State<QRScanPage> {
     });
   }
 }
+
