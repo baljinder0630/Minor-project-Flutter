@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Provider/socketProvider.dart';
@@ -115,7 +114,7 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
         context.go(RouteLocation.home);
       });
 
-      log("Assign task by " + user.role + " to " + currentPatient!.name);
+      print("Assign task by " + user.role + " to " + currentPatient!.name);
       if (user.role == "careTaker" && currentPatient!.id != "") {
         ref
             .read(socketProvider.notifier)

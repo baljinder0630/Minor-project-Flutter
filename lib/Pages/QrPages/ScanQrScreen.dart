@@ -44,15 +44,6 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-<<<<<<< HEAD
-      body: Center(
-        child: TextButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => QRScanPage()));
-            },
-            child: Text("Scan QR Code")),
-=======
       appBar: AppBar(
         title: Text("Scan QR Code"),
         centerTitle: true,
@@ -75,9 +66,7 @@ class _ScanQrScreenState extends ConsumerState<ScanQrScreen> {
             ),
           ),
         ),
->>>>>>> 22bdf8b0c05e71dad12e8c84152922be5af6b512
       ),
     );
   }
 }
-
