@@ -5,13 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/constants.dart';
 import 'package:minor_project/models/assignedPatient.dart';
 import 'package:minor_project/models/user_model.dart';
+import 'package:minor_project/to_do/providers/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final authStateProvider =
-    StateNotifierProvider<UserAuth, AuthState>(((ref) => UserAuth()));
+    StateNotifierProvider<UserAuth, AuthState>(((ref) => UserAuth(ref: ref)));
 
 class UserAuth extends StateNotifier<AuthState> {
-  UserAuth()
+  StateNotifierProviderRef ref;
+
+  UserAuth({required this.ref})
       : super(AuthState(
           user: User(email: '', id: '', name: '', role: '', contactNumber: ''),
           authStatus: AuthStatus.initial,
@@ -216,7 +219,7 @@ class UserAuth extends StateNotifier<AuthState> {
   }
 
   Future<bool> allocateCareTaker(String url) async {
-    url += "patientId=" + state.user.id;
+    url += "patientId=${state.user.id}";
     log(url);
 
     try {
@@ -319,6 +322,7 @@ class UserAuth extends StateNotifier<AuthState> {
   Future<void> logout() async {
     log("In logout function");
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await ref.read(tasksProvider.notifier).clearDb();
     // final refreshToken = prefs.getString("RT");
     await prefs.clear();
     state = state.copyWith(appStatus: AppStatus.unauthenticated);

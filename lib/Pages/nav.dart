@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/Gallery/galleryPage.dart';
 import 'package:minor_project/Pages/QrPages/ScanQrScreen.dart';
-import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
 import 'package:minor_project/Pages/WelcomeScreen/welcome_screen.dart';
 import 'package:minor_project/Provider/socketProvider.dart';
 import 'package:minor_project/Provider/userProvider.dart';
@@ -13,6 +12,8 @@ import 'package:minor_project/to_do/app/app.dart';
 import 'package:flutter/material.dart';
 
 class Nav extends ConsumerStatefulWidget {
+  const Nav({super.key});
+
   @override
   _NavState createState() => _NavState();
 }
@@ -40,7 +41,8 @@ class _NavState extends ConsumerState<Nav> {
     ];
     const screen2 = [
       TodoHome(),
-      Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      // Center(child: Text("gallery", style: TextStyle(fontSize: 72))),
+      GalleryPage(),
       ScanQrScreen()
     ];
     if (role == Role.careTaker) {
@@ -58,8 +60,8 @@ class _NavState extends ConsumerState<Nav> {
         ),
         bottomNavigationBar: NavigationBarTheme(
           data: const NavigationBarThemeData(
-            indicatorColor: Colors.purple,
-          ),
+              // indicatorColor: Colors.purple,
+              ),
           child: NavigationBar(
               selectedIndex: index,
               onDestinationSelected: (index) =>
@@ -90,9 +92,7 @@ class _NavState extends ConsumerState<Nav> {
           ),
         ),
         bottomNavigationBar: NavigationBarTheme(
-          data: const NavigationBarThemeData(
-            indicatorColor: Colors.purple,
-          ),
+          data: const NavigationBarThemeData(),
           child: NavigationBar(
               selectedIndex: index,
               onDestinationSelected: (index) =>

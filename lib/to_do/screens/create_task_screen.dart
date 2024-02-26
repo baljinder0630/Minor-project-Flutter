@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Provider/socketProvider.dart';
+import 'package:minor_project/Provider/userProvider.dart';
+import 'package:uuid/uuid.dart';
 import '../config/config.dart';
 import '../data/data.dart';
 import '../providers/providers.dart';
@@ -86,6 +89,9 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
   }
 
   void _createTask() async {
+    final user = ref.watch(authStateProvider).user;
+    final currentPatient = ref.watch(authStateProvider).currentPatient;
+
     final title = _titleController.text.trim();
     final note = _noteController.text.trim();
     final time = ref.watch(timeProvider);
@@ -93,11 +99,13 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
     final category = ref.watch(categoryProvider);
     if (title.isNotEmpty) {
       final task = Task(
+        id: const Uuid().v1() + user.id.toString(),
         title: title,
         category: category,
         time: Helpers.timeToString(time),
         date: DateFormat.yMMMd().format(date),
         note: note,
+        assignedBy: user.name ?? "*",
         isCompleted: false,
       );
 
@@ -105,6 +113,13 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
         AppAlerts.displaySnackbar(context, 'Task create successfully');
         context.go(RouteLocation.home);
       });
+
+      print("Assign task by " + user.role + " to " + currentPatient!.name);
+      if (user.role == "careTaker" && currentPatient!.id != "") {
+        ref
+            .read(socketProvider.notifier)
+            .assignTaskToPatient(task, user.id, currentPatient.id);
+      }
     } else {
       AppAlerts.displaySnackbar(context, 'Title cannot be empty');
     }
