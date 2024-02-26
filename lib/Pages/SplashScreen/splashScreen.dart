@@ -21,7 +21,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       log("Listening ....." + next.appStatus.toString());
       log(next.user.toString());
       if (next.appStatus == AppStatus.authenticated) {
-        print("here");
         if (ref.watch(authStateProvider).user.role == 'careTaker') {
           Navigator.pushReplacement(
             context,

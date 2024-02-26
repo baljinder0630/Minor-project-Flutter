@@ -4,9 +4,9 @@ main() async {
   print('Hello World!');
   // Dart client
   // IO.Socket socket = IO.io(
-  //     'https://assistalzheimer.onrender.com',
   IO.Socket socket = IO.io(
-      'http://192.168.101.5:5000',
+      // 'https://assistalzheimer.onrender.com',
+      'http://localhost:5000',
       IO.OptionBuilder().setAuth({
         "role": "patient",
         "userId": "6593dc206342a2d7242067cd",

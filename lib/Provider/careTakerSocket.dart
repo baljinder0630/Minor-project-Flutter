@@ -6,7 +6,7 @@ main() {
   print('Hello World!');
   // Dart client
   IO.Socket socket = IO.io(
-      'http://192.168.101.5:5000',
+      'http://localhost:5000',
       // IO.Socket socket = IO.io('https://assistalzheimer.onrender.com',
       IO.OptionBuilder().setTransports(['websocket']).setAuth({
         'role': "careTaker",

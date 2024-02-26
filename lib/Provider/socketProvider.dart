@@ -27,7 +27,8 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
 
   SocketNotifier({required this.role, required this.userId, required this.ref})
       : super(IO.io(
-            'http://192.168.101.5:5000',
+            // 'http://192.168.101.5:5000',
+            'https://assistalzheimer.onrender.com',
             IO.OptionBuilder().setTransports(['websocket']).setAuth({
               'role': role,
               'userId': userId,
@@ -57,7 +58,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
     // state.on('updateLocation', (data) => log("data.toString()"));
 
     state.onConnect((data) {
-      log(state.id.toString());
+      log("User connected with server with " + state.id.toString());
       // registerUser();
       listenLocation();
       if (role == "patient") {
@@ -68,8 +69,10 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
   }
 
   void tasksFromCareTaker() {
+    log("Listening for tasks");
     if (!mounted) return;
     state.on("tasksFromCareTaker", (data) {
+      log("Task fetched");
       Future.microtask(() async {
         var taskData = data["task"];
         Task task = Task.fromJson(taskData);
@@ -176,6 +179,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
       log("empty user id or role in assignTaskToPatient");
       return;
     }
+    log('from ' + from + ' task ' + task.toString() + ' to ' + to);
     state.emit('assignTaskToPatient', {'from': from, 'task': task, 'to': to});
   }
 }

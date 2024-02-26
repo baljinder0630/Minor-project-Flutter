@@ -115,6 +115,8 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
         AppAlerts.displaySnackbar(context, 'Task create successfully');
         context.go(RouteLocation.home);
       });
+
+      log("Assign task by " + user.role + " to " + currentPatient!.name);
       if (user.role == "careTaker" && currentPatient!.id != "") {
         ref
             .read(socketProvider.notifier)

@@ -14,17 +14,13 @@ class _ScanQrState extends ConsumerState<ScanQrScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Center(
-            child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => QRScanPage()));
-                },
-                child: Text("Scan QR Code")),
-          ),
-        ],
+      body: Center(
+        child: TextButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => QRScanPage()));
+            },
+            child: Text("Scan QR Code")),
       ),
     );
   }
