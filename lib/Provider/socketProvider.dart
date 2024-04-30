@@ -1,9 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
-
 import 'package:geolocator/geolocator.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:minor_project/Provider/userProvider.dart';
@@ -19,7 +17,6 @@ final socketProvider = StateNotifierProvider((ref) => SocketNotifier(
 
 class SocketNotifier extends StateNotifier<IO.Socket> {
   StateNotifierProviderRef<Object?, Object?> ref;
-  LatLng? patientLocation;
   String role;
   String userId;
   @override
@@ -61,11 +58,11 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
     state.onConnect((data) {
       log("User connected with server with " + state.id.toString());
       // registerUser();
-      listenLocation();
       if (role == "patient") {
         sendLocation();
         tasksFromCareTaker();
-      }
+      } else
+        listenLocation();
     });
   }
 
@@ -101,7 +98,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
       log(data.toString());
       var lat = data['latitude'];
       var lng = data['longitude'];
-      patientLocation = LatLng(lat, lng);
+      ref.read(patientLocationProvider.notifier).location = LatLng(lat, lng);
     });
   }
 
@@ -132,7 +129,7 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
       // checking service
     });
     final LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
+      accuracy: LocationAccuracy.medium,
       distanceFilter: 0,
     );
     final positionStream =
@@ -182,5 +179,16 @@ class SocketNotifier extends StateNotifier<IO.Socket> {
     }
     log('from ' + from + ' task ' + task.toString() + ' to ' + to);
     state.emit('assignTaskToPatient', {'from': from, 'task': task, 'to': to});
+  }
+}
+
+final patientLocationProvider =
+    StateNotifierProvider<PatientLocation, LatLng>((ref) => PatientLocation());
+
+class PatientLocation extends StateNotifier<LatLng> {
+  PatientLocation() : super(LatLng(0, 0));
+
+  set location(LatLng location) {
+    state = location;
   }
 }
