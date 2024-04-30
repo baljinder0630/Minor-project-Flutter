@@ -1,17 +1,20 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/nav.dart';
+import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class QRScanPage extends StatefulWidget {
+class QRScanPage extends ConsumerStatefulWidget {
   const QRScanPage({Key? key}) : super(key: key);
 
   @override
-  State<QRScanPage> createState() => _QRScanPageState();
+  ConsumerState<QRScanPage> createState() => _QRScanPageState();
 }
 
-class _QRScanPageState extends State<QRScanPage> {
+class _QRScanPageState extends ConsumerState<QRScanPage> {
   final qrKey = GlobalKey(debugLabel: 'QR');
 
   QRViewController? controller;
@@ -44,7 +47,10 @@ class _QRScanPageState extends State<QRScanPage> {
             alignment: Alignment.center,
             children: <Widget>[
               buildQrView(context),
-              Positioned(top: 10, child: buildControlButtons(),),
+              Positioned(
+                top: 10,
+                child: buildControlButtons(),
+              ),
               if (qrScanned)
                 const Center(
                     child: CircularProgressIndicator(
@@ -111,14 +117,40 @@ class _QRScanPageState extends State<QRScanPage> {
       this.controller = controller;
     });
 
-    controller.scannedDataStream.listen((barCode) {
+    controller.scannedDataStream.listen((barCode) async {
       if (barCode.code!.contains(host)) {
         log("Qr scanned: ${barCode.code} ");
         setState(() {
           qrScanned = true;
         });
+
         controller.pauseCamera();
-        controller.dispose(); // Close the camera
+        controller.dispose();
+        if (await ref
+            .watch(authStateProvider.notifier)
+            .allocateCareTaker(barCode.code!)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("CareTaker Allocated",
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          Navigator.of(context).pop();
+          // snackbar
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("CareTaker Allocation Failed",
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+        // Close the camera
         // WidgetsBinding.instance.addPostFrameCallback((_) {
         //   Navigator.of(context).pop();
         // });
@@ -126,4 +158,3 @@ class _QRScanPageState extends State<QRScanPage> {
     });
   }
 }
-

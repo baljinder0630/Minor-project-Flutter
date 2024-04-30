@@ -38,9 +38,9 @@ class AppAlerts {
               context,
               'Task deleted successfully',
             );
-            context.pop();
           },
         );
+        context.pop();
       },
       child: const Text('YES'),
     );

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:minor_project/Pages/location/googleMap.dart';
 import 'package:minor_project/Provider/socketProvider.dart';
 
 class LocationHomePage extends ConsumerStatefulWidget {
@@ -17,10 +16,62 @@ class LocationHomePage extends ConsumerStatefulWidget {
 }
 
 class _LocationHomePageState extends ConsumerState<LocationHomePage> {
+  LatLng caretakerLocation = LatLng(0.0, 0.0);
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getCaretakerLocation();
+  }
+
+  Future<void> _getCaretakerLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // get the location of the caretaker.
+    Position position = await Geolocator.getCurrentPosition();
+    caretakerLocation = LatLng(position.latitude, position.longitude);
+  }
+
+  double calculateDistance(patientLocation) {
+    double distanceInMeters = Geolocator.distanceBetween(
+        caretakerLocation.latitude,
+        caretakerLocation.longitude,
+        patientLocation.latitude,
+        patientLocation.longitude);
+    return distanceInMeters;
+  }
+
   @override
   Widget build(BuildContext context) {
-    LatLng patientLocation =
-        ref.read(socketProvider.notifier).patientLocation ?? LatLng(0, 0);
+    LatLng patientLocation = ref.watch(patientLocationProvider);
 
     return Scaffold(
         body: Stack(
@@ -43,13 +94,14 @@ class _LocationHomePageState extends ConsumerState<LocationHomePage> {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: createGradient(patientLocation.latitude),
+                  gradient: createGradient(
+                      (calculateDistance(patientLocation) / 1000)),
                 ),
                 child: Center(
-                  child: 200 == 0.0
+                  child: patientLocation == LatLng(0.0, 0.0)
                       ? CircularProgressIndicator()
                       : Text(
-                          '$patientLocation m',
+                          'Latitude: ${patientLocation.latitude}, Longitude: ${patientLocation.longitude}',
                           style: TextStyle(
                             // color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -62,24 +114,17 @@ class _LocationHomePageState extends ConsumerState<LocationHomePage> {
             SizedBox(
               height: 20,
             ),
-            Text(
-              "Patient is ${200.toInt()} m away from You",
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            ),
+            if (caretakerLocation != LatLng(0.0, 0.0))
+              Center(
+                child: Text(
+                  "Patient is ${(calculateDistance(patientLocation) / 1000).toInt().toString()} KM away from You",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ),
             SizedBox(
               height: 50,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: ElevatedButton(
-                onPressed: () async {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (c) {
-                    return GoogleMapPage();
-                  }));
-                },
-                child: const Text("Get Location"),
-              ),
             ),
           ],
         ),
@@ -93,7 +138,7 @@ Gradient createGradient(double distance) {
   Color endColor;
   Color innerColor;
 
-  if (distance < 1000) {
+  if (distance < 8) {
     // Green side for distances less than 1000
     startColor = Color(0xFF4CAF50); // Green color
     endColor = Color(0xFF2E7D32); // Darker green color
