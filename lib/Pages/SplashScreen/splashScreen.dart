@@ -45,10 +45,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         );
       }
     });
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 237, 211, 79),
       body: Center(
-        child: Text('Loading...'),
-      ),
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: Image.asset("assets/icons/appLogo.png",
+                width: 200, height: 300),
+          )
+        ],
+      )),
     );
   }
 }

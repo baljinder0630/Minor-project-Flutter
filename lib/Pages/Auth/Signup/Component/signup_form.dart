@@ -180,7 +180,8 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                           backgroundColor: Colors.green,
                         ),
                       );
-                      Navigator.pushReplacement(
+                      Navigator.popUntil(context, (route) => false);
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
@@ -199,7 +200,15 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                   }
                 },
                 child: authStatus == AuthStatus.processing
-                    ? CircularProgressIndicator()
+                    ? Container(
+                        height: 20,
+                        width: 20,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
                     : Text(
                         "Sign Up".toUpperCase(),
                       ),

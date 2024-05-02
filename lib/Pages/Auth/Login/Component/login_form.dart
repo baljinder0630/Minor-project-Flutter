@@ -111,7 +111,6 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             tag: "login_btn",
             child: ElevatedButton(
               onPressed: () async {
-                print(authStatus);
                 if (authStatus != AuthStatus.processing &&
                     _formkey.currentState!.validate()) {
                   var resp = await ref.read(authStateProvider.notifier).signIn(
@@ -126,7 +125,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                         backgroundColor: Colors.green,
                       ),
                     );
-                    Navigator.pushReplacement(
+                    Navigator.popUntil(context, (route) => false);
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
@@ -145,7 +145,15 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 }
               },
               child: authStatus == AuthStatus.processing
-                  ? CircularProgressIndicator()
+                  ? Container(
+                      height: 20,
+                      width: 20,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
                   : Text(
                       "Login".toUpperCase(),
                       style: TextStyle(

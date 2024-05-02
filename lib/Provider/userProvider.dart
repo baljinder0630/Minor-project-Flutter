@@ -165,6 +165,7 @@ class UserAuth extends StateNotifier<AuthState> {
       }
     } catch (e) {
       log(e.toString());
+      state = state.copyWith(authStatus: AuthStatus.error);
       return {"success": false, "message": "Something went wrong"};
     }
   }
@@ -190,7 +191,7 @@ class UserAuth extends StateNotifier<AuthState> {
       );
 
       final data = json.decode(response.body);
-      log(data.toString());
+      print(data.toString());
       if (data["success"]) {
         final data = jsonDecode(response.body);
         final accessToken = data["accessToken"] ?? "";
@@ -214,6 +215,8 @@ class UserAuth extends StateNotifier<AuthState> {
       }
     } catch (e) {
       log(e.toString());
+      state = state.copyWith(authStatus: AuthStatus.error);
+
       return {"success": false, "message": "Something went wrong"};
     }
   }

@@ -8,3 +8,4 @@ const kAccentColor = Color(0xFF000000);
 
 const double defaultPadding = 16.0;
 const host = "https://assistalzheimer.onrender.com/api";
+// const host = "https://alzheimer-assistant-backend.vercel.app/api";
