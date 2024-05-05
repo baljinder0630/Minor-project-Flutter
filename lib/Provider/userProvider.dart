@@ -226,7 +226,7 @@ class UserAuth extends StateNotifier<AuthState> {
             as Map<String, dynamic>; // Convert DocumentSnapshot to Map
         if (data['type'] == 'accepted') {
           print("Request already accepted");
-          return true;
+          return false;
         }
       }
 

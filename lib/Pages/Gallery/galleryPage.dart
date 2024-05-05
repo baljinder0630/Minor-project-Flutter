@@ -18,16 +18,15 @@
 //   }
 // }
 
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:minor_project/Pages/Gallery/imagePickerScreen.dart';
+import 'package:minor_project/Pages/Gallery/scanObject.dart';
 import 'package:minor_project/Provider/galleryProvider.dart';
 import 'package:minor_project/constants.dart';
 import 'package:minor_project/to_do/widgets/display_white_text.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class GalleryPage extends ConsumerStatefulWidget {
   const GalleryPage({Key? key}) : super(key: key);
@@ -160,12 +159,27 @@ class _GalleryPageState extends ConsumerState<GalleryPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ImagePickerScreen()));
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.add),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ImagePickerScreen()));
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.camera),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ObjectDetectorView()));
+            },
+          ),
+          // Add more SpeedDialChild widgets if you want more options in your speed dial.
+        ],
       ),
     );
   }
