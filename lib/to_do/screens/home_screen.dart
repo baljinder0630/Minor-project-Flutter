@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Provider/userProvider.dart';
 import '../config/config.dart';
 import '../data/data.dart';
 import '../providers/providers.dart';
@@ -23,25 +24,27 @@ class HomeScreen extends ConsumerWidget {
     final taskState = ref.watch(tasksProvider);
     final inCompletedTasks = _incompltedTask(taskState.tasks, ref);
     final completedTasks = _compltedTask(taskState.tasks, ref);
-
+    final patient = ref.watch(authStateProvider).role == Role.careTaker
+        ? ref.watch(authStateProvider).currentPatient!.name.toString()
+        : ref.watch(authStateProvider).user.name;
     return Scaffold(
       body: Stack(
         children: [
           AppBackground(
-            headerHeight: deviceSize.height * 0.3,
+            headerHeight: deviceSize.height * 0.2,
             header: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    onTap: () => Helpers.selectDate(context, ref),
-                    child: DisplayWhiteText(
-                      text: Helpers.dateFormatter(date),
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  const DisplayWhiteText(text: 'My Todo List', size: 40),
+                  // InkWell(
+                  //   onTap: () => Helpers.selectDate(context, ref),
+                  //   child: DisplayWhiteText(
+                  //     text: Helpers.dateFormatter(date),
+                  //     fontWeight: FontWeight.normal,
+                  //   ),
+                  // ),
+                  DisplayWhiteText(text: "Task For : " + patient, size: 30),
                 ],
               ),
             ),
@@ -50,6 +53,7 @@ class HomeScreen extends ConsumerWidget {
             left: 0,
             right: 0,
             bottom: 0,
+            top: deviceSize.height * 0.1,
             child: SafeArea(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),

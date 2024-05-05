@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';
@@ -57,6 +58,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                     padding: const EdgeInsets.all(defaultPadding),
                     child: Icon(Icons.person),
                   ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -80,6 +85,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                     padding: const EdgeInsets.all(defaultPadding),
                     child: Icon(Icons.email),
                   ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
                 ),
                 validator: (value) {
                   bool validEmail = RegExp(
@@ -102,6 +111,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                 controller: passController,
                 cursorColor: kPrimaryColor,
                 decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: kPrimaryColor),
+                    ),
                     hintText: "Your password",
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(defaultPadding),
@@ -135,6 +148,10 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                 cursorColor: kPrimaryColor,
                 onSaved: (firstname) {},
                 decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
                   hintText: "Phonenumber",
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(defaultPadding),
@@ -180,15 +197,28 @@ class _SignUpFormState extends ConsumerState<SignUpForm> {
                           backgroundColor: Colors.green,
                         ),
                       );
-                      Navigator.popUntil(context, (route) => false);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return Nav();
-                          },
-                        ),
-                      );
+                      //Navigator.popUntil(context, (route) => false);
+                      if (role == "patient") {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Nav();
+                            },
+                          ),
+                          (route) => false,
+                        );
+                      } else {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return QrCodePage();
+                            },
+                          ),
+                          (route) => false,
+                        );
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

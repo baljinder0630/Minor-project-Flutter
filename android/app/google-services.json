@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66432888881",
+    "project_id": "alzheimer-assistant-app",
+    "storage_bucket": "alzheimer-assistant-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66432888881:android:f3f82e24a2f3caf7122510",
+        "android_client_info": {
+          "package_name": "com.example.minor_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyW69rFl2h-9gvYW5AZRAvCclIaf6kehY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

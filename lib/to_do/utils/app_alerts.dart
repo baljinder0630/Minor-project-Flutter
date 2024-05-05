@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/data.dart';
-import '../providers/providers.dart';
-import '../utils/utils.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minor_project/Provider/todoProvider.dart';
+import '../data/data.dart';
+import '../utils/utils.dart';
 
 @immutable
 class AppAlerts {
@@ -26,13 +26,9 @@ class AppAlerts {
     required WidgetRef ref,
     required Task task,
   }) async {
-    Widget cancelButton = TextButton(
-      child: const Text('NO'),
-      onPressed: () => context.pop(),
-    );
     Widget deleteButton = TextButton(
       onPressed: () async {
-        await ref.read(tasksProvider.notifier).deleteTask(task).then(
+        await ref.read(todoProvider.notifier).deleteTask(task.id).then(
           (value) {
             displaySnackbar(
               context,
@@ -49,7 +45,6 @@ class AppAlerts {
       title: const Text('Are you sure you want to delete this task?'),
       actions: [
         deleteButton,
-        cancelButton,
       ],
     );
 

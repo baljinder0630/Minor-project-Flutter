@@ -10,5 +10,6 @@ class TaskKeys {
   static const String time = 'time';
   static const String note = 'note';
   static const String assignedBy = 'assignedBy';
+  static const String assignedTo = 'assignedTo';
   static const String isCompleted = 'isCompleted';
 }

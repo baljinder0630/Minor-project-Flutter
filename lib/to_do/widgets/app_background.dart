@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minor_project/constants.dart';
 import '../utils/utils.dart';
 
 class AppBackground extends StatelessWidget {
@@ -17,7 +18,7 @@ class AppBackground extends StatelessWidget {
         Container(
           height: headerHeight,
           width: deviceSize.width,
-          color: colors.primary,
+          color: kPrimaryColor,
           child: Center(child: header),
         ),
         Expanded(

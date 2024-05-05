@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';
+import 'package:minor_project/to_do/widgets/widgets.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRScanPage extends ConsumerStatefulWidget {
@@ -39,7 +40,7 @@ class _QRScanPageState extends ConsumerState<QRScanPage> {
   Widget build(BuildContext context) => SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("Scan QR Code"),
+            title: DisplayWhiteText(text: "Scan QR Code"),
             centerTitle: true,
             backgroundColor: kPrimaryColor,
           ),
@@ -118,34 +119,36 @@ class _QRScanPageState extends ConsumerState<QRScanPage> {
     });
 
     controller.scannedDataStream.listen((barCode) async {
-      if (barCode.code!.contains(host)) {
-        log("Qr scanned: ${barCode.code} ");
-        setState(() {
-          qrScanned = true;
-        });
-
+      final data =
+          await ref.read(authStateProvider.notifier).verifyQRData(barCode.code);
+      if (data != null) {
+        if (mounted) {
+          setState(() {
+            qrScanned = true;
+          });
+        }
         controller.pauseCamera();
         controller.dispose();
         if (await ref
             .watch(authStateProvider.notifier)
-            .allocateCareTaker(barCode.code!)) {
+            .allocateCareTaker(data)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text("CareTaker Allocated",
+            const SnackBar(
+              content: Text("CareTaker Allocated",
                   style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
+              duration: Duration(seconds: 2),
             ),
           );
           Navigator.of(context).pop();
           // snackbar
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text("CareTaker Allocation Failed",
+            const SnackBar(
+              content: Text("CareTaker Allocation Failed",
                   style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
+              duration: Duration(seconds: 2),
             ),
           );
           Navigator.of(context).pop();

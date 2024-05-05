@@ -1,5 +1,11 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:minor_project/Provider/userProvider.dart';
+import 'package:uuid/uuid.dart';
+
 import '../../utils/utils.dart';
 import '../../data/data.dart';
 import 'package:path/path.dart';
@@ -32,20 +38,7 @@ class TaskDatasource {
     );
   }
 
-  void _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE ${AppKeys.dbTable} (
-        ${TaskKeys.id} TEXT PRIMARY KEY ,
-        ${TaskKeys.title} TEXT,
-        ${TaskKeys.note} TEXT,
-        ${TaskKeys.date} TEXT,
-        ${TaskKeys.time} TEXT,
-        ${TaskKeys.category} TEXT,
-        ${TaskKeys.assignedBy} TEXT,
-        ${TaskKeys.isCompleted} INTEGER
-      )
-    ''');
-  }
+  void _onCreate(Database db, int version) async {}
 
   Future<int> addTask(Task task) async {
     log(task.id.toString());

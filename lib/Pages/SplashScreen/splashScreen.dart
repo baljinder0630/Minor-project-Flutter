@@ -18,7 +18,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(authStateProvider, (previous, next) {
-      log("Listening .....${next.appStatus}");
+      print("Listening .....${next.appStatus}");
       log(next.user.toString());
       if (next.appStatus == AppStatus.authenticated) {
         if (ref.watch(authStateProvider).user.role == 'careTaker') {
@@ -36,7 +36,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             ),
           );
         }
-      } else if (next.appStatus == AppStatus.unauthenticated) {
+      } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -45,6 +45,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         );
       }
     });
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 237, 211, 79),
       body: Center(

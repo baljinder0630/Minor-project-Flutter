@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minor_project/Pages/Auth/Signup/signup_screen.dart';
 import 'package:minor_project/Pages/Auth/Component/already_have_an_account_acheck.dart';
+import 'package:minor_project/Pages/QrPages/qrCodePage.dart';
 import 'package:minor_project/Pages/nav.dart';
 import 'package:minor_project/Provider/userProvider.dart';
 import 'package:minor_project/constants.dart';
@@ -52,6 +53,10 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 padding: const EdgeInsets.all(defaultPadding),
                 child: Icon(Icons.person),
               ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: kPrimaryColor),
+              ),
             ),
             validator: (value) {
               bool validEmail = RegExp(
@@ -78,6 +83,10 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                     padding: const EdgeInsets.all(defaultPadding),
                     child: Icon(Icons.lock),
                   ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: kPrimaryColor),
+                  ),
                   suffixIcon: InkWell(
                     onTap: () {
                       setState(() {
@@ -96,16 +105,6 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 return null;
               },
             ),
-          ),
-          SwitchListTile(
-            title: Text(isPatient ? 'Patient' : 'Care Taker'),
-            value: isPatient,
-            onChanged: (bool value) {
-              setState(() {
-                isPatient = value;
-                role = isPatient ? 'patient' : 'careTaker';
-              });
-            },
           ),
           Hero(
             tag: "login_btn",
@@ -126,14 +125,25 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                       ),
                     );
                     Navigator.popUntil(context, (route) => false);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Nav();
-                        },
-                      ),
-                    );
+                    ref.watch(authStateProvider).role == Role.careTaker
+                        ? Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return QrCodePage();
+                              },
+                            ),
+                            (route) => false,
+                          )
+                        : Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return Nav();
+                              },
+                            ),
+                            (route) => false,
+                          );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
