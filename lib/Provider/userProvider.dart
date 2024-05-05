@@ -148,7 +148,9 @@ class UserAuth extends StateNotifier<AuthState> {
         'role': role,
       });
 
-      state = state.copyWith(authStatus: AuthStatus.processed);
+      state = state.copyWith(
+          authStatus: AuthStatus.processed,
+          user: UserModel(email: email, id: users.id, name: name, role: role));
       return {"success": true, "message": "User created successfully"};
     } catch (e) {
       print(e.toString());
